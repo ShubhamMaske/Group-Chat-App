@@ -24,14 +24,17 @@ form.addEventListener('submit', verifyData);
 
                 const response = await axios.post("http://localhost:3000/user/signUp",myObject);
                 if(response.status === 201){
+                    alert("Successfuly signed up");
                     window.location.href = "./signin.html";
                 }
-                else{
-                    throw new Error(response.message);
-                }
+                
 
             }
             catch (err) {
-                console.log("verifyData function error --", err)
+                if(err.response.status === 400){
+                    alert(err.response.data.message);
+                }else{
+                    console.log(err);
+                }
             }
         }
