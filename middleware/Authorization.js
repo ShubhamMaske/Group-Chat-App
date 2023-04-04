@@ -8,7 +8,6 @@ exports.authenticate = (req, res, next) => {
         const user = jwt.verify(token,process.env.TOKEN_PRIVATE_KEY);
 
         User.findByPk(user.userId).then(user => {
-
             req.user = user;
             next();
         })
