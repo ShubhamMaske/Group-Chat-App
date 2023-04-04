@@ -42,20 +42,20 @@
                     <p id="msg">hello</p>
                 </div>
                 <div class="messages outgoing">
-                    <h5 id="userName">Shyam</h5>
-                    <p id="msg">Hi</p>
+                    <h5 id="userName"></h5>
+                    <p id="msg"></p>
                 </div>
                 </div>
                 <div class="user-input">
-                    <input type="text" placeholder="Enter your massage..">
-                    <button>Send</button>
+                    <input type="text" placeholder="Enter your massage.." id="userMessage">
+                    <button id="send">Send</button>
                 </div>
             </div>
         </div>
     </main>
 
-
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.js"></script>
+    <script src="./chat.js"></script>
     <script>
         var userwindow = document.querySelector('.users-window')
         function showhide(){

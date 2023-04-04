@@ -18,9 +18,9 @@ form.addEventListener('submit',signInUser);
 
                 const response = await axios.post("http://localhost:3000/user/signIn",Obj);
                 if(response.status === 201){
-                    localStorage.setItem('token',response.data.token);
+                    localStorage.setItem('usertoken',response.data.token);
                     alert(response.data.message);
-                    window.location.href = "./signin.html";
+                    window.location.href = "./chat.html";
                 }
 
             }

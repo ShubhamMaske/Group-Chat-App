@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const userRoutes = require('./routes/userRoutes');
-
+const messageRoutes = require('./routes/messageRoutes');
 
 
 
@@ -18,6 +18,7 @@ app.use(cors());
 app.use(bodyParser.json({ extended: false }));
 
 app.use('/user', userRoutes);
+app.use('/message',messageRoutes);
 
 
 db.sync()
