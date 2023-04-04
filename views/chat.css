@@ -1,0 +1,164 @@
+*{
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+    font-family: 'Poppins',sans-serif;
+}
+
+main{
+    position: absolute;
+    top:50%;
+    left: 50%;
+    border-radius: 10px;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    overflow: hidden;
+
+}
+
+header{
+    background-color: aliceblue;
+    padding: 5px 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
+    align-items:center;
+}
+header h2{
+    font-size: 30px;
+}
+header button{
+    background-color: transparent;
+    border: none;
+    outline: none;
+    width: 5%;
+    display: none;
+}
+
+
+.title{
+    text-align: center;
+}
+
+/* display:flex;
+flex-direction: row;
+justify-content:flex-start;
+align-items:center;
+ */
+
+ .container{
+    background-color: lightgray;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content:flex-start;
+    align-items:stretch;
+ }
+.users-window{
+    width:350px;
+    background-color:seashell;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin-right: 20px;
+}
+.user-head{
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.chat-window{
+    width: 100%;
+    background-color:azure;
+    border-radius: 10px;
+}
+
+.chats{
+    min-height: 80vh;
+    padding: 15px;
+}
+.user-joined{
+    font-size: 1rem;
+    background-color: rgb(210, 220, 215);
+    border-radius: 40px;
+    width: 90%;
+    padding: 7px 15px;
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+
+.messages{
+    color: darkgray;
+    background-color: rgb(232, 223, 223);
+    padding: 5px 15px;
+    max-width: 400px;
+    margin-bottom: 15px;
+    border-radius: 10px 40px 10px 10px;
+}
+/* #userName{
+    text-align: right;
+    background-color: rgb(207, 204, 204);
+    border-radius: 25px;
+} */
+#msg{
+    color: black;
+    font-size: 16px;
+}
+.outgoing{
+    margin-left: auto;
+    border-radius: 40px 10px 10px 10px;
+    text-align: right;
+}
+
+.user-input{
+    background-color: darkslategrey;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content:space-around;
+    align-items:stretch;
+}
+input{
+    font-size: 16px;
+    padding: 5px 15px;
+    width: 90%;
+    border-radius: 10px;
+}
+button{
+    background-color: aqua;
+    width: 10%;
+    font-weight:bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+button:hover{
+    background-color: cornflowerblue;
+    color: azure;
+}
+
+
+@media  screen and (max-width: 800px) {
+    header button{
+        display: block;
+    }
+    .container{
+        position:relative
+    }
+    .users-window{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        border-radius: 0 0 10px 10px;
+        height: max-content;
+        z-index: 10;
+        padding-bottom: 0;
+        display: none;
+    }
+
+    .messages{
+        max-width: 300px;
+    }
+    .user-input button{
+        width: fit-content;
+    }
+}
