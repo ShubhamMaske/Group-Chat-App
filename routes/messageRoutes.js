@@ -5,6 +5,8 @@ const userAuth = require('../middleware/Authorization');
 const router = express.Router();
 
 router.post('/saveMsg',userAuth.authenticate,messageController.saveMessage);
+router.get('/getMsg',userAuth.authenticate,messageController.getMessages)
+// router.get('/getNewMsg/:messageId',messageController.getNewMessage);
 
 
 module.exports = router;

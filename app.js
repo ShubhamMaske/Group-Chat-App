@@ -8,6 +8,7 @@ const messageRoutes = require('./routes/messageRoutes');
 
 
 const User = require('./models/users');
+const Message = require('./models/messages');
 
 
 const db = require('./util/database');
@@ -19,6 +20,10 @@ app.use(bodyParser.json({ extended: false }));
 
 app.use('/user', userRoutes);
 app.use('/message',messageRoutes);
+
+
+User.hasMany(Message);
+Message.belongsTo(User);
 
 
 db.sync()
