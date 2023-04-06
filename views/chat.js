@@ -7,13 +7,13 @@ async function gettingMsg(){
     try{ 
         const token = localStorage.getItem('usertoken');
         var totalLen = localStorage.getItem('len');
-        const messages = await axios.get("http://localhost:3000/message/getMsg",{ headers: { "Authorization": token } })
+        const messages = await axios.get(`http://localhost:3000/message/getMsg/${totalLen}`,{ headers: { "Authorization": token } })
         
-        console.log(messages.data.allMessages.length)
         var newLen = messages.data.allMessages.length;
-        localStorage.setItem('len',newLen);
-        if(totalLen < newLen){
-            
+
+        if(newLen > 0){
+            totalLen++;
+            localStorage.setItem('len',totalLen);
             newLen--; 
             for (var i = newLen; i < messages.data.allMessages.length; i++) {
                 showMessages(messages.data.allMessages[i]); 
@@ -26,6 +26,8 @@ async function gettingMsg(){
     }
 }
 
+var messages = [];
+localStorage.setItem('MsgArray',JSON.stringify(messages));
 
 window.addEventListener("DOMContentLoaded", async () => {
     try{
@@ -36,12 +38,48 @@ window.addEventListener("DOMContentLoaded", async () => {
         users.data.AllUsers.forEach(element => {
             showUsers(element);
         });
-        const messages = await axios.get("http://localhost:3000/message/getMsg",{ headers: { "Authorization": token } })
+          
+            var lastMsgId = 0; 
+            const msgArray = JSON.parse(localStorage.getItem('MsgArray'));
+            const index = 0;
+            console.log("MsgArr  ",msgArray[index]);
+            console.log("MsgArr is array",Array.isArray(msgArray));
+            console.log("length local",msgArray.length)
+            if(msgArray.length == 0){
+                lastMsgId = undefined;     
+            }
+            else{
+                var length = msgArray.length;
+                
+                lastMsgId = msgArray[length-1].id;
+                console.log("lastMsgId  ",lastMsgId);
+                for (var i = 0; i < msgArray.length; i++) {
+                    showMessages(msgArray[i]);
+                }
+            }
+
+            const messages = await axios.get(`http://localhost:3000/message/getNewMsg/${lastMsgId}`,{ headers: { "Authorization": token } })
+            console.log("backend length  ",messages.data.allMessages.length);
+            if(messages.data.allMessages.length > 0){
+                for (var i = 0; i < messages.data.allMessages.length; i++) {
+                    showMessages(messages.data.allMessages[i]);
+                }
+                let newMsg = messages.data.allMessages;
+                msgArray.push(...newMsg);
+                localStorage.setItem("MsgArray",JSON.stringify(msgArray))
+                localStorage.setItem('len',messages.data.allMessages.length);
+            }
+        
+        //
+        //
+        //
+        // const messages = await axios.get("http://localhost:3000/message/getMsg",{ headers: { "Authorization": token } })
+        console.log("-<>-",messages.data.allMessages);
         li.textContent = messages.data.username + " Joined the chat";
-        localStorage.setItem('len',messages.data.allMessages.length);
-        for (var i = 0; i < messages.data.allMessages.length; i++) {
-            showMessages(messages.data.allMessages[i]);
-        }
+        // localStorage.setItem('len',messages.data.allMessages.length);
+        // for (var i = 0; i < messages.data.allMessages.length; i++) {
+        //     showMessages(messages.data.allMessages[i]);
+        // }
 
         joinedUser.appendChild(li);
     }

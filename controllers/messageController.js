@@ -18,10 +18,14 @@ exports.saveMessage = async(req, res, next) => {
     }
 }
 
+//getting new msg(if present) in every 2 sec
 exports.getMessages = async(req, res, next) => {
     try{
-        const messages = await Message.findAll();
-        console.log("messages length",messages.length)
+        let oldMsgLength = +req.params.totalLen;
+        const messages = await Message.findAll({
+            where:{id: { [Op.gt]: oldMsgLength }},
+        });
+
         const username = req.user.name;
         res.status(201).json({allMessages:messages,username});
 
@@ -31,24 +35,26 @@ exports.getMessages = async(req, res, next) => {
     }
 }
 
-
-// exports.getNewMessage = async (req, res,next) => {
-//     try{
-//         const oldMessageId = +req.params.messageId;
-//         const message = await Message.findAll({
-//             where:{id: { [Op.gt]: oldMessageId }},
-//         })
-//         if(message.length > 0){
-//             return res.status(201).json({success:true,newMessage:message}); 
-//         }
-//         else{
-//             res.status(201).json({success:false});
-//         }
-
-//         // console.log("newMessage",message);
-//         // res.status(201).json({newMessage:message});
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-// }
+//
+exports.getNewMessage = async (req, res,next) => {
+    try{
+        const oldMessageId = req.params.lastMsgId;
+        console.log("old msg Id",oldMessageId);
+        const username = req.user.name;
+         if(oldMessageId === undefined){
+            oldMessageId = -1;   
+         }
+        console.log("old msg Id after comparing",oldMessageId);
+        const messages = await Message.findAll({
+            where:{id: { [Op.gt]: oldMessageId }},
+        })
+      
+        res.status(201).json({success:true,allMessages:messages,username}); 
+        
+        
+        
+    }
+    catch(err){
+        console.log(err);
+    }
+}
