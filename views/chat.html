@@ -20,16 +20,42 @@
                 <i class="fa-solid fa-bars"></i>
             </button>
         </header>
+        
 
         <div class="container">
             <div class="users-window">
                 <div class="user-head">
                     <h3>Users</h3>
+                    <button id="creategroup" onclick="showoption()"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </div>
-                <div class="user-list">
-                    <ul id="users"></ul>
+                <div class="user-window">
+                    
+                    <div class="user-list">
+                        <ul id="users"></ul>
+                    </div>
+                </div>
+                <div class="group-header">
+                    <h3>Groups</h3>
+                    <button id="creategroup" onclick="creategroup()"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <div class="create-group">
+                    <input type="text" placeholder="Enter group name" id="inputgroupname">
+                    <br>
+                    <button id="createGroup">Create</button>
+                </div>
+                <div class="groups"> 
+                    <div class="group-list">
+                        <ul id="groupName">
+                            
+                        </ul>
+                    </div>
                 </div>
             </div>
+
+            <!-- <div class="groups">
+                <p>hii</p>
+            </div> -->
+            
             <div class="chat-window">
                 <div class="chats">
                 <div class="user-joined">
@@ -49,7 +75,7 @@
                 </div>
                 </div>
                 <div class="user-input">
-                    <input type="text" placeholder="Enter your massage.." id="userMessage">
+                    <input type="text" placeholder="enter message.." id="userMessage">
                     <button id="send">Send</button>
                 </div>
             </div>
@@ -60,12 +86,22 @@
     <script src="./chat.js"></script>
     <script>
         var userwindow = document.querySelector('.users-window')
+        var creategroupWindow = document.querySelector('.create-group')
         function showhide(){
             if(userwindow.style.display == 'block'){
                 userwindow.style.display = "none"
             }
             else{
                 userwindow.style.display = "block"
+            }
+        }
+
+        function creategroup(){
+            if(creategroupWindow.style.display == 'block'){
+                creategroupWindow.style.display = "none";
+            }
+            else{
+                creategroupWindow.style.display = "block";
             }
         }
     </script>

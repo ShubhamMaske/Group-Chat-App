@@ -7,9 +7,10 @@ const { Op } = require("sequelize");
 exports.saveMessage = async(req, res, next) => {
     try{
         const message = req.body.message;
+        const groupid = req.params.groupid;
         var Msg = `${req.user.name} : ${message}`
 
-        const result = await Message.create({message:Msg,userId:req.user.id});
+        const result = await Message.create({message:Msg,userId:req.user.id,groupId:groupid});
         res.status(201).json({message:"message save in DB",Info:result})
 
     }
@@ -32,6 +33,17 @@ exports.getMessages = async(req, res, next) => {
     }
     catch(err){
         res.status(500).json({error:err})
+    }
+}
+
+exports.groupMessages = async (req,res,next) => {
+    try{
+        const groupid = req.params.groupid;
+        let messages = await Message.findAll({where: {groupId:groupid}});
+        res.status(201).json({allMessages:messages});
+    }
+    catch(err){
+        console.log(err)
     }
 }
 
