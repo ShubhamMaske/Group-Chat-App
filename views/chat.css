@@ -84,6 +84,7 @@ align-items:center;
     margin-right: 20px;
     margin-bottom: 10px;
     height: 40vh;
+    overflow-y: auto;
     /* display: flex;
     flex-direction: column; */
     border: 1px solid rgb(110, 155, 146);
@@ -108,6 +109,54 @@ align-items:center;
     border: 2px solid black;
 }
 
+
+.find{
+    display: none;
+    position: absolute;
+    left: 30%;
+    top: 20%;
+    width: 200px;
+    height: 350px;
+    border-radius: 10px;
+    background-color: rgb(193, 191, 199);
+    overflow-y:auto;
+}
+.find ul li{
+    margin-left: 30px;
+    margin-bottom: 3px;
+    list-style:square;
+}
+.find button{
+    width: fit-content;
+}
+.liButton{
+    width: fit-content;
+    padding: 2px;
+    margin-left: 5px;
+}
+
+.removeuser{
+    width: fit-content;
+    padding: 1px;
+    margin-left: 20px;
+}
+.removeuser:hover{
+    color: white;
+    background-color:cornflowerblue;
+    cursor: pointer;
+}
+
+.makeAdmin{
+    width: fit-content;
+    padding: 1px;
+    margin-left: 5px;
+}
+
+.makeAdmin:hover{
+    color: white;
+    background-color: cornflowerblue;
+    cursor: pointer;
+}
 
 .groups{
     width:320px;
@@ -166,7 +215,7 @@ align-items:center;
 .create-group{
     display: none;
     position: absolute;
-    left: 50%;
+    left: 30%;
     top: 50%;
     width: 350px;
     height: 100px;

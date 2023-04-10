@@ -1,6 +1,7 @@
 const Message = require('../models/messages');
 const User = require('../models/users');
 const sequelize = require('../util/database');
+const usergroup = require('../models/usergroups');
 const { Op } = require("sequelize");
 
 
@@ -40,7 +41,8 @@ exports.groupMessages = async (req,res,next) => {
     try{
         const groupid = req.params.groupid;
         let messages = await Message.findAll({where: {groupId:groupid}});
-        res.status(201).json({allMessages:messages});
+        let adminid = await usergroup.findOne({where: {isadmin: true,groupId:groupid}})
+        res.status(201).json({allMessages:messages,admin:adminid});
     }
     catch(err){
         console.log(err)

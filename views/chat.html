@@ -28,6 +28,13 @@
                     <h3>Users</h3>
                     <button id="creategroup" onclick="showoption()"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </div>
+                <div class="find">
+                    <!-- <input type="text" id="inputusername">
+                    <button type="button" id="searchUser">Search</button> -->
+                    <ul id="searchResult">
+
+                    </ul>
+                </div>
                 <div class="user-window">
                     
                     <div class="user-list">
@@ -85,8 +92,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.js"></script>
     <script src="./chat.js"></script>
     <script>
-        var userwindow = document.querySelector('.users-window')
-        var creategroupWindow = document.querySelector('.create-group')
+        var userwindow = document.querySelector('.users-window');
+        var creategroupWindow = document.querySelector('.create-group');
+        var findClass = document.querySelector('.find');
         function showhide(){
             if(userwindow.style.display == 'block'){
                 userwindow.style.display = "none"
@@ -102,6 +110,69 @@
             }
             else{
                 creategroupWindow.style.display = "block";
+            }
+        }
+
+        async function showoption(){
+            try{
+                const parentElement = document.getElementById('searchResult');
+                parentElement.innerHTML = "";
+                if(findClass.style.display == 'block'){
+                    findClass.style.display = "none"
+                }
+                else{
+                    findClass.style.display = "block";
+
+                    let users = await axios.get("http://localhost:3000/user/getUsers");
+                    users.data.allUsers.forEach( user => {
+                        showAllUser(user);
+                    })
+                }
+                
+            }
+            catch(err){
+                console.log(err);
+            }
+        }
+
+        async function showAllUser(user){
+            try{
+                const parentElement = document.getElementById('searchResult');
+                const childElement = document.createElement('li');
+                const token = localStorage.getItem('usertoken');
+                console.log("token  ",token);
+                const btn = document.createElement('input');
+                btn.type = "button"
+                btn.value = "Add user";
+                btn.setAttribute('id', user.id);
+                btn.className = 'liButton'
+
+                childElement.textContent = user.name;
+
+                btn.onclick = async ()=>{
+                    try{
+                    const userid = btn.id;
+                    const groupid = localStorage.getItem('currentgroupid');
+                    const token = localStorage.getItem('usertoken');
+                    const adminid = localStorage.getItem('adminId');
+                    console.log("ttoken ",token)
+                    console.log("user added group id ",groupid)
+                    const useradded = await axios.post(`http://localhost:3000/group/adduser/${userid}/${groupid}/${adminid}`)
+                    
+                    alert("user added successfully");
+                    }
+                    catch(err){
+                        alert("user is already added");
+                        console.log(err);
+                    }
+
+                }
+
+                parentElement.appendChild(childElement);
+                childElement.appendChild(btn);
+            }
+            catch(err){
+                console.log(err);
             }
         }
     </script>

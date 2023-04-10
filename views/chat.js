@@ -12,6 +12,7 @@ async function createGroupFunction() {
     try {
         const token = localStorage.getItem('usertoken');
         var name = document.getElementById('inputgroupname').value;
+        document.getElementById('inputgroupname').value = "";
         createGroupWindow.style.display = "none";
         let groupObj = {
             groupName: name
@@ -31,6 +32,9 @@ async function createGroupFunction() {
 }
 /*  -------------------------------------------- */
 
+//-----------------------Make user Admin --------------------
+
+
 
 
 /* ------------------- Get Messages from specified group ------- */
@@ -40,7 +44,7 @@ document.getElementById("groupName").addEventListener("click", async function (e
         console.log("group id = ", e.target);
         const groupid = e.target.id;
         document.getElementById('addingMsg').innerHTML = "";
-        if(localStorage.getItem('currentgroupid') == null || localStorage.getItem('currentgroupid') !== groupid){   
+        if (localStorage.getItem('currentgroupid') == null || localStorage.getItem('currentgroupid') !== groupid) {
             localStorage.setItem('currentgroupid', groupid);
             const token = localStorage.getItem('usertoken');
             const messages = await axios.get(`http://localhost:3000/message/getMsgFromGroup/${groupid}`, { headers: { "Authorization": token } })
@@ -52,10 +56,19 @@ document.getElementById("groupName").addEventListener("click", async function (e
             // else{
             //     document.querySelector('.messages').style.display = 'block'; 
             // }
-
+            var admin_id = messages.data.admin.userId;
+            localStorage.setItem('adminId', admin_id);
             for (var i = 0; i < messages.data.allMessages.length; i++) {
                 showMessages(messages.data.allMessages[i]);
             }
+
+
+            const users = await axios.get(`http://localhost:3000/user/allusers/${groupid}`)
+            document.getElementById('users').innerHTML = "";
+            users.data.AllUsers.forEach(element => {
+                showUsers(element);
+            });
+
         }
     }
     catch (err) {
@@ -94,19 +107,28 @@ document.getElementById("groupName").addEventListener("click", async function (e
 var messages = [];
 localStorage.setItem('MsgArray', JSON.stringify(messages));
 
+let groupArray = [];
+
 window.addEventListener("DOMContentLoaded", async () => {
     try {
         const token = localStorage.getItem('usertoken');
         const joinedUser = document.getElementById('joinedUser')
         const li = document.createElement('li');
-        const users = await axios.get("http://localhost:3000/user/allusers")
-        users.data.AllUsers.forEach(element => {
-            showUsers(element);
-        });
+        // const users = await axios.get("http://localhost:3000/user/allusers")
+        // users.data.AllUsers.forEach(element => {
+        //     showUsers(element);
+        // });
 
         const Groups = await axios.get('http://localhost:3000/group/getallgroups', { headers: { "Authorization": token } })
         for (var a = 0; a < Groups.data.groups.length; a++) {
             showUsergroups(Groups.data.groups[a]);
+        }
+
+        const allGroups = await axios.get('http://localhost:3000/group/allgroups', { headers: { "Authorization": token } })
+        if (allGroups.data.groups.length > 0) {
+            for (var a = 0; a < Groups.data.groups.length; a++) {
+                groupArray.push(Groups.data.groups[a]);
+            }
         }
 
 
@@ -204,10 +226,68 @@ async function showMessages(data) {
 
 async function showUsers(user) {
     try {
-        const parentElement = document.getElementById('users');
+        const parentEle = document.getElementById('users');
         const childElement = document.createElement('li');
-        childElement.textContent = user.name;
-        parentElement.appendChild(childElement);
+        let adminId = localStorage.getItem('adminId');
+        console.log(user.id == adminId);
+        
+            childElement.textContent = user.name;
+            parentEle.appendChild(childElement);
+        if(user.id != adminId){
+            const removebtn = document.createElement('input');
+            removebtn.type = "button"
+            removebtn.className = 'removeuser';
+            removebtn.value = "remove";
+            removebtn.setAttribute('id', user.id);
+
+            const adminbtn = document.createElement('input');
+            adminbtn.type = "button"
+            adminbtn.className = 'makeAdmin';
+            adminbtn.value = "make Admin";
+            adminbtn.setAttribute('id', user.id);
+
+            childElement.textContent = user.name;
+            parentEle.appendChild(childElement);
+            childElement.appendChild(removebtn);
+            childElement.appendChild(adminbtn);
+
+
+            adminbtn.onclick = async (e)=> {
+                try{
+                    alert("Admin btn click");
+                    const userid = adminbtn.id;
+                    const groupid = localStorage.getItem('currentgroupid');
+                    const token = localStorage.getItem('usertoken');
+                    const adminid = localStorage.getItem('adminId');
+                    const response = await axios.post(`http://localhost:3000/group/makeadmin/${userid}/${groupid}/${adminid}`);
+                    alert(response.data.message);
+                    e.target.previousSibling.remove();
+                    e.target.remove();
+                }
+                catch(err){
+                    console.log("make admin error",err)
+                }
+            }
+        
+            removebtn.onclick = async (e)=> {
+                try{
+                    alert("remove btn click");
+                    const userid = removebtn.id;
+                    const groupid = localStorage.getItem('currentgroupid');
+                    const token = localStorage.getItem('usertoken');
+                    const adminid = localStorage.getItem('adminId');
+                    const response = await axios.post(`http://localhost:3000/group/removeuser/${userid}/${groupid}/${adminid}`);
+                    alert(response.data.message);
+                    e.target.parentElement.remove();
+                    
+                }
+                catch(err){
+        
+                }
+            }
+
+            
+        }
     }
     catch (err) {
         console.log(err)
@@ -227,3 +307,6 @@ async function showUsergroups(group) {
         console.log("showing userGroup err- ", err);
     }
 }
+
+
+    

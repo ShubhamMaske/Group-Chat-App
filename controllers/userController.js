@@ -1,6 +1,7 @@
 const User = require('../models/users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Usergroup = require('../models/usergroups');
 
 
 function isStringinValid(string) {
@@ -74,10 +75,32 @@ exports.signinUser = async(req, res, next) =>{
 }
 
 
-exports.getAllUsers = async(req, res, next) => {
+exports.getAllUsers = async (req, res, next) => {
     try{
+
         const users = await User.findAll();
-        res.status(201).json({AllUsers: users});
+        res.status(201).json({allUsers:users});
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({err})
+    }
+}
+
+exports.getAllUsersOfGroup = async(req, res, next) => {
+    try{
+        const groupid = req.params.groupid;
+        let groupUsers = [];
+
+        const usersIds = await Usergroup.findAll({where: {groupId : groupid}});
+
+        for(let i = 0; i<usersIds.length;i++){
+            let user = usersIds[i];
+            const userdetail = await User.findOne({where: {id : user.dataValues.userId}});
+            groupUsers.push(userdetail.dataValues);
+            console.log(userdetail.dataValues);
+        }
+        res.status(201).json({AllUsers: groupUsers});
     }
     catch(err){
         res.status(500).json({err})
