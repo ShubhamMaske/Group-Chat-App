@@ -97,6 +97,11 @@ exports.getAllUsersOfGroup = async(req, res, next) => {
         for(let i = 0; i<usersIds.length;i++){
             let user = usersIds[i];
             const userdetail = await User.findOne({where: {id : user.dataValues.userId}});
+            if(user.dataValues.isadmin == true){
+                userdetail.dataValues.admin = 1;
+            }else{
+                userdetail.dataValues.admin = 0;
+            }
             groupUsers.push(userdetail.dataValues);
             console.log(userdetail.dataValues);
         }

@@ -32,7 +32,7 @@ async function createGroupFunction() {
 }
 /*  -------------------------------------------- */
 
-//-----------------------Make user Admin --------------------
+
 
 
 
@@ -43,23 +43,25 @@ document.getElementById("groupName").addEventListener("click", async function (e
     try {
         console.log("group id = ", e.target);
         const groupid = e.target.id;
+        document.getElementById('groupheading').innerHTML = e.target.innerHTML;
         document.getElementById('addingMsg').innerHTML = "";
         if (localStorage.getItem('currentgroupid') == null || localStorage.getItem('currentgroupid') !== groupid) {
             localStorage.setItem('currentgroupid', groupid);
             const token = localStorage.getItem('usertoken');
             const messages = await axios.get(`http://localhost:3000/message/getMsgFromGroup/${groupid}`, { headers: { "Authorization": token } })
 
-            // if (messages.data.allMessages.length == 0) {
-            //     document.querySelector('.messages').style.display = 'none';
-            //     alert("No chats");
-            // }
-            // else{
-            //     document.querySelector('.messages').style.display = 'block'; 
-            // }
+            
+            var totalMsgs = messages.data.allMessages.length;
             var admin_id = messages.data.admin.userId;
             localStorage.setItem('adminId', admin_id);
             for (var i = 0; i < messages.data.allMessages.length; i++) {
                 showMessages(messages.data.allMessages[i]);
+            }
+            if (totalMsgs > 0) {
+                var idOfLastMessage = messages.data.allMessages[totalMsgs - 1].id;
+                localStorage.setItem('idOfLastMessage', idOfLastMessage);
+            } else {
+                console.log(" zero messages");
             }
 
 
@@ -68,7 +70,7 @@ document.getElementById("groupName").addEventListener("click", async function (e
             users.data.AllUsers.forEach(element => {
                 showUsers(element);
             });
-
+            setInterval(gettingMsg, 2000);
         }
     }
     catch (err) {
@@ -79,102 +81,63 @@ document.getElementById("groupName").addEventListener("click", async function (e
 
 
 
-//setInterval(gettingMsg,2000);
 
-// async function gettingMsg(){
-//     try{ 
-//         const token = localStorage.getItem('usertoken');
-//         var totalLen = localStorage.getItem('len');
-//         const messages = await axios.get(`http://localhost:3000/message/getMsg/${totalLen}`,{ headers: { "Authorization": token } })
 
-//         var newLen = messages.data.allMessages.length;
+async function gettingMsg() {
+    try {
+        const token = localStorage.getItem('usertoken');
+        var totalLen = localStorage.getItem('len');
+        var groupid = localStorage.getItem('currentgroupid');
+        const messages = await axios.get(`http://localhost:3000/message/getMsg/${totalLen}/${groupid}`, { headers: { "Authorization": token } })
+        
 
-//         if(newLen > 0){
-//             totalLen++;
-//             localStorage.setItem('len',totalLen);
-//             newLen--; 
-//             for (var i = newLen; i < messages.data.allMessages.length; i++) {
-//                 showMessages(messages.data.allMessages[i]); 
-//         }
-//     }
-
-//     }
-//     catch(err){
-//         console.log("getting updated msg error/no new message --",err);
-//     }
-// }
+            if(messages.data.allMessages){
+            if (messages.data.allMessages.id != localStorage.getItem('idOfLastMessage')) {
+                localStorage.setItem('idOfLastMessage', messages.data.allMessages.id)
+                totalLen++;
+                localStorage.setItem('len', totalLen);
+                showMessages(messages.data.allMessages);
+                
+            }
+        }
+            
+        
+    }
+    catch (err) {
+    console.log("getting updated msg error/no new message --", err);
+}
+}
 
 var messages = [];
 localStorage.setItem('MsgArray', JSON.stringify(messages));
 
-let groupArray = [];
+
+function parseJwt(token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
 
 window.addEventListener("DOMContentLoaded", async () => {
     try {
         const token = localStorage.getItem('usertoken');
         const joinedUser = document.getElementById('joinedUser')
         const li = document.createElement('li');
-        // const users = await axios.get("http://localhost:3000/user/allusers")
-        // users.data.AllUsers.forEach(element => {
-        //     showUsers(element);
-        // });
-
+        const groupid = localStorage.getItem('currentgroupid');
+        const decodeToken = parseJwt(token);
+        localStorage.setItem('loginuserID',decodeToken.userId);
         const Groups = await axios.get('http://localhost:3000/group/getallgroups', { headers: { "Authorization": token } })
         for (var a = 0; a < Groups.data.groups.length; a++) {
             showUsergroups(Groups.data.groups[a]);
         }
 
-        const allGroups = await axios.get('http://localhost:3000/group/allgroups', { headers: { "Authorization": token } })
-        if (allGroups.data.groups.length > 0) {
-            for (var a = 0; a < Groups.data.groups.length; a++) {
-                groupArray.push(Groups.data.groups[a]);
-            }
-        }
 
-
-        var lastMsgId = 0;
-        const msgArray = JSON.parse(localStorage.getItem('MsgArray'));
-        const index = 0;
-        console.log("MsgArr  ", msgArray[index]);
-        console.log("MsgArr is array", Array.isArray(msgArray));
-        console.log("length local", msgArray.length)
-        if (msgArray.length == 0) {
-            lastMsgId = undefined;
-        }
-        else {
-            var length = msgArray.length;
-
-            lastMsgId = msgArray[length - 1].id;
-            console.log("lastMsgId  ", lastMsgId);
-            for (var i = 0; i < msgArray.length; i++) {
-                showMessages(msgArray[i]);
-            }
-        }
-
-        const messages = await axios.get(`http://localhost:3000/message/getNewMsg/${lastMsgId}`, { headers: { "Authorization": token } })
-        console.log("backend length  ", messages.data.allMessages.length);
-        if (messages.data.allMessages.length > 0) {
-            for (var i = 0; i < messages.data.allMessages.length; i++) {
-                showMessages(messages.data.allMessages[i]);
-            }
-            let newMsg = messages.data.allMessages;
-            msgArray.push(...newMsg);
-            localStorage.setItem("MsgArray", JSON.stringify(msgArray))
-            localStorage.setItem('len', messages.data.allMessages.length);
-        }
-
-        //
-        //
-        //
-        // const messages = await axios.get("http://localhost:3000/message/getMsg",{ headers: { "Authorization": token } })
-        console.log("-<>-", messages.data.allMessages);
-        li.textContent = messages.data.username + " Joined the chat";
-        // localStorage.setItem('len',messages.data.allMessages.length);
-        // for (var i = 0; i < messages.data.allMessages.length; i++) {
-        //     showMessages(messages.data.allMessages[i]);
-        // }
-
-        joinedUser.appendChild(li);
+        
     }
     catch (err) {
         console.log("Dom loaded error-- ", err);
@@ -198,6 +161,7 @@ async function addMessage(e) {
         length++;
         localStorage.setItem('len', length);
         localStorage.setItem('messageId', response.data.Info.id);
+        localStorage.setItem('idOfLastMessage',response.data.Info.id);
         showMessages(response.data.Info);
 
 
@@ -230,10 +194,11 @@ async function showUsers(user) {
         const childElement = document.createElement('li');
         let adminId = localStorage.getItem('adminId');
         console.log(user.id == adminId);
-        
-            childElement.textContent = user.name;
+        if(user.admin == 1){
+            childElement.textContent = `${user.name} : Admin`;
             parentEle.appendChild(childElement);
-        if(user.id != adminId){
+        }
+        else if (user.admin == 0) {
             const removebtn = document.createElement('input');
             removebtn.type = "button"
             removebtn.className = 'removeuser';
@@ -252,41 +217,40 @@ async function showUsers(user) {
             childElement.appendChild(adminbtn);
 
 
-            adminbtn.onclick = async (e)=> {
-                try{
-                    alert("Admin btn click");
+            adminbtn.onclick = async (e) => {
+                try {
                     const userid = adminbtn.id;
                     const groupid = localStorage.getItem('currentgroupid');
-                    const token = localStorage.getItem('usertoken');
-                    const adminid = localStorage.getItem('adminId');
+                    const adminid = localStorage.getItem('loginuserID');
                     const response = await axios.post(`http://localhost:3000/group/makeadmin/${userid}/${groupid}/${adminid}`);
                     alert(response.data.message);
-                    e.target.previousSibling.remove();
-                    e.target.remove();
+                    if(response.status == 201){
+                        e.target.previousSibling.remove();
+                        e.target.remove();
+                    }
                 }
-                catch(err){
-                    console.log("make admin error",err)
-                }
-            }
-        
-            removebtn.onclick = async (e)=> {
-                try{
-                    alert("remove btn click");
-                    const userid = removebtn.id;
-                    const groupid = localStorage.getItem('currentgroupid');
-                    const token = localStorage.getItem('usertoken');
-                    const adminid = localStorage.getItem('adminId');
-                    const response = await axios.post(`http://localhost:3000/group/removeuser/${userid}/${groupid}/${adminid}`);
-                    alert(response.data.message);
-                    e.target.parentElement.remove();
-                    
-                }
-                catch(err){
-        
+                catch (err) {
+                    console.log("make admin error", err)
                 }
             }
 
-            
+            removebtn.onclick = async (e) => {
+                try {
+                    const userid = removebtn.id;
+                    const groupid = localStorage.getItem('currentgroupid');
+                    const adminid = localStorage.getItem('loginuserID');
+                    const response = await axios.post(`http://localhost:3000/group/removeuser/${userid}/${groupid}/${adminid}`);
+                    alert(response.data.message);
+                    if(response.status == 201){
+                        e.target.parentElement.remove();
+                    }
+                }
+                catch (err) {
+
+                }
+            }
+
+
         }
     }
     catch (err) {
@@ -309,4 +273,3 @@ async function showUsergroups(group) {
 }
 
 
-    

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,6 +11,7 @@
     <link rel="stylesheet" href="chat.css">
     <title>Group Chat</title>
 </head>
+
 <body>
     <main>
         <header>
@@ -20,13 +22,14 @@
                 <i class="fa-solid fa-bars"></i>
             </button>
         </header>
-        
+
 
         <div class="container">
             <div class="users-window">
                 <div class="user-head">
                     <h3>Users</h3>
-                    <button id="creategroup" onclick="showoption()"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    <button id="creategroup" onclick="showoption()"><i
+                            class="fa-solid fa-magnifying-glass"></i></button>
                 </div>
                 <div class="find">
                     <!-- <input type="text" id="inputusername">
@@ -36,7 +39,7 @@
                     </ul>
                 </div>
                 <div class="user-window">
-                    
+
                     <div class="user-list">
                         <ul id="users"></ul>
                     </div>
@@ -50,10 +53,10 @@
                     <br>
                     <button id="createGroup">Create</button>
                 </div>
-                <div class="groups"> 
+                <div class="groups">
                     <div class="group-list">
                         <ul id="groupName">
-                            
+
                         </ul>
                     </div>
                 </div>
@@ -62,24 +65,27 @@
             <!-- <div class="groups">
                 <p>hii</p>
             </div> -->
-            
+
             <div class="chat-window">
+                <div class="grouphead">
+                    <h3 id="groupheading"></h3>
+                </div>
                 <div class="chats">
-                <div class="user-joined">
-                    <ul id="joinedUser">
-                
-                    </ul>
-                </div>
-                <div class="messages incoming">
-                    <ul id="addingMsg"></ul>
-                    <!-- <h5 id="userName"></h5> -->
-                    <p class="msg"></p>
-                    <ul></ul>
-                </div>
-                <div class="messages outgoing">
-                    <h5 id="userName"></h5>
-                    <p class="msg2"></p>
-                </div>
+                    <div class="user-joined">
+                        <ul id="joinedUser">
+
+                        </ul>
+                    </div>
+                    <div class="messages incoming">
+                        <ul id="addingMsg"></ul>
+                        <!-- <h5 id="userName"></h5> -->
+                        <p class="msg"></p>
+                        <ul></ul>
+                    </div>
+                    <div class="messages outgoing">
+                        <h5 id="userName"></h5>
+                        <p class="msg2"></p>
+                    </div>
                 </div>
                 <div class="user-input">
                     <input type="text" placeholder="enter message.." id="userMessage">
@@ -95,52 +101,52 @@
         var userwindow = document.querySelector('.users-window');
         var creategroupWindow = document.querySelector('.create-group');
         var findClass = document.querySelector('.find');
-        function showhide(){
-            if(userwindow.style.display == 'block'){
+        function showhide() {
+            if (userwindow.style.display == 'block') {
                 userwindow.style.display = "none"
             }
-            else{
+            else {
                 userwindow.style.display = "block"
             }
         }
 
-        function creategroup(){
-            if(creategroupWindow.style.display == 'block'){
+        function creategroup() {
+            if (creategroupWindow.style.display == 'block') {
                 creategroupWindow.style.display = "none";
             }
-            else{
+            else {
                 creategroupWindow.style.display = "block";
             }
         }
 
-        async function showoption(){
-            try{
+        async function showoption() {
+            try {
                 const parentElement = document.getElementById('searchResult');
                 parentElement.innerHTML = "";
-                if(findClass.style.display == 'block'){
+                if (findClass.style.display == 'block') {
                     findClass.style.display = "none"
                 }
-                else{
+                else {
                     findClass.style.display = "block";
 
                     let users = await axios.get("http://localhost:3000/user/getUsers");
-                    users.data.allUsers.forEach( user => {
+                    users.data.allUsers.forEach(user => {
                         showAllUser(user);
                     })
                 }
-                
+
             }
-            catch(err){
+            catch (err) {
                 console.log(err);
             }
         }
 
-        async function showAllUser(user){
-            try{
+        async function showAllUser(user) {
+            try {
                 const parentElement = document.getElementById('searchResult');
                 const childElement = document.createElement('li');
                 const token = localStorage.getItem('usertoken');
-                console.log("token  ",token);
+                console.log("token  ", token);
                 const btn = document.createElement('input');
                 btn.type = "button"
                 btn.value = "Add user";
@@ -149,20 +155,21 @@
 
                 childElement.textContent = user.name;
 
-                btn.onclick = async ()=>{
-                    try{
-                    const userid = btn.id;
-                    const groupid = localStorage.getItem('currentgroupid');
-                    const token = localStorage.getItem('usertoken');
-                    const adminid = localStorage.getItem('adminId');
-                    console.log("ttoken ",token)
-                    console.log("user added group id ",groupid)
-                    const useradded = await axios.post(`http://localhost:3000/group/adduser/${userid}/${groupid}/${adminid}`)
-                    
-                    alert("user added successfully");
+                btn.onclick = async () => {
+                    try {
+                        const userid = btn.id;
+                        const groupid = localStorage.getItem('currentgroupid');
+                        const token = localStorage.getItem('usertoken');
+                        const adminid = localStorage.getItem('loginuserID');
+                        console.log("ttoken ", token)
+                        console.log("user added group id ", groupid)
+                        const useradded = await axios.post(`http://localhost:3000/group/adduser/${userid}/${groupid}/${adminid}`)
+                        console.log(useradded.data.User);
+                        show_Users(useradded.data.User);
+                        alert(useradded.data.message);
                     }
-                    catch(err){
-                        alert("user is already added");
+                    catch (err) {
+                        alert(useradded.data.message);
                         console.log(err);
                     }
 
@@ -171,11 +178,82 @@
                 parentElement.appendChild(childElement);
                 childElement.appendChild(btn);
             }
-            catch(err){
+            catch (err) {
                 console.log(err);
             }
         }
+
+        async function show_Users(user) {
+            try {
+                const parentEle = document.getElementById('users');
+                const childElement = document.createElement('li');
+                let adminId = localStorage.getItem('adminId');
+                console.log(user.id == adminId);
+                if (user.admin == 1) {
+                    childElement.textContent = `${user.name} : Admin`;
+                    parentEle.appendChild(childElement);
+                }
+                else if (user.admin == 0) {
+                    const removebtn = document.createElement('input');
+                    removebtn.type = "button"
+                    removebtn.className = 'removeuser';
+                    removebtn.value = "remove";
+                    removebtn.setAttribute('id', user.id);
+
+                    const adminbtn = document.createElement('input');
+                    adminbtn.type = "button"
+                    adminbtn.className = 'makeAdmin';
+                    adminbtn.value = "make Admin";
+                    adminbtn.setAttribute('id', user.id);
+
+                    childElement.textContent = user.name;
+                    parentEle.appendChild(childElement);
+                    childElement.appendChild(removebtn);
+                    childElement.appendChild(adminbtn);
+
+
+                    adminbtn.onclick = async (e) => {
+                        try {
+                            const userid = adminbtn.id;
+                            const groupid = localStorage.getItem('currentgroupid');
+                            const adminid = localStorage.getItem('loginuserID');
+                            const response = await axios.post(`http://localhost:3000/group/makeadmin/${userid}/${groupid}/${adminid}`);
+                            alert(response.data.message);
+                            if (response.status == 201) {
+                                e.target.previousSibling.remove();
+                                e.target.remove();
+                            }
+                        }
+                        catch (err) {
+                            console.log("make admin error", err)
+                        }
+                    }
+
+                    removebtn.onclick = async (e) => {
+                        try {
+                            const userid = removebtn.id;
+                            const groupid = localStorage.getItem('currentgroupid');
+                            const adminid = localStorage.getItem('loginuserID');
+                            const response = await axios.post(`http://localhost:3000/group/removeuser/${userid}/${groupid}/${adminid}`);
+                            alert(response.data.message);
+                            if (response.status == 201) {
+                                e.target.parentElement.remove();
+                            }
+                        }
+                        catch (err) {
+
+                        }
+                    }
+
+
+                }
+            }
+            catch (err) {
+                console.log(err)
+            }
+        }
     </script>
-    
+
 </body>
+
 </html>

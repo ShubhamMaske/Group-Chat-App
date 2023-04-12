@@ -1,6 +1,6 @@
 const Group = require('../models/groups');
 const usergroup = require('../models/usergroups');
-
+const User = require('../models/users');
 
 //-------------------Create Group----------------------//
 exports.creategroup = async (req, res, next) => {
@@ -62,7 +62,7 @@ exports.adduserToGroup = async (req, res, next) => {
     try{
         const userid = req.params.userid;
         const groupid = req.params.groupid;
-        const adminuserid = req.params.adminid;
+        const adminuserid = +req.params.adminid;
         const checkAdmin = await usergroup.findOne({
             where: {
                 groupId : groupid,
@@ -76,7 +76,9 @@ exports.adduserToGroup = async (req, res, next) => {
             if(result.length <= 0){
                 return res.status(203).json({message: "User is already added"});
             }
-            return res.status(201).json({success:false, message:"user added successfully"})
+            const user = await User.findOne({where:{id:userid}})
+            user.dataValues.admin = 0;
+            return res.status(201).json({success:false, message:"user added successfully",User:user.dataValues})
         }
         else{
             return res.status(202).json({success:false,message: "You are not admin"})
@@ -96,11 +98,11 @@ exports.makeusertoAdmin = async (req, res, next) => {
     try{
         const userid = req.params.userid;
         const groupid = req.params.groupid;
-        const adminuserid = req.params.adminid;
+        const adminid = +req.params.adminid;
         const checkAdmin = await usergroup.findOne({
             where: {
                 groupId : groupid,
-                userId: adminuserid,
+                userId: adminid,
                 isadmin : true
             }
         })
@@ -115,7 +117,6 @@ exports.makeusertoAdmin = async (req, res, next) => {
             return res.status(202).json({success:false,message: "You are not admin to make changes"})
         }
 
-
     }
     catch(err){
         console.log(err);
@@ -129,11 +130,11 @@ exports.removeUserFromGroup = async (req, res, next) => {
     try{
         const userid = req.params.userid;
         const groupid = req.params.groupid;
-        const adminuserid = req.params.adminid;
+        const adminid = +req.params.adminid;
         const checkAdmin = await usergroup.findOne({
             where: {
                 groupId : groupid,
-                userId: adminuserid,
+                userId: adminid,
                 isadmin : true
             }
         })

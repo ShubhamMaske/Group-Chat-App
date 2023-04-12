@@ -24,7 +24,7 @@ main{
     transform: translate(-50%, -50%);
     width: 90%;
     overflow: hidden;
-
+    border: 1px solid black;
 }
 
 header{
@@ -235,6 +235,13 @@ align-items:center;
     border-radius: 5px;
 }
 
+
+.grouphead{
+    text-align: center;
+    color: azure;
+    background-color: rgb(61, 102, 102);
+    margin-bottom: 5px;
+}
 
 .chat-window{
     width: 100%;

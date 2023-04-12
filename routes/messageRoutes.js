@@ -5,7 +5,7 @@ const userAuth = require('../middleware/Authorization');
 const router = express.Router();
 
 router.post('/saveMsg/:groupid',userAuth.authenticate,messageController.saveMessage);
-router.get('/getMsg/:totalLen',userAuth.authenticate,messageController.getMessages)
+router.get('/getMsg/:totalLen/:groupid',userAuth.authenticate,messageController.getMessages)
  router.get('/getNewMsg/:lastMsgId',userAuth.authenticate,messageController.getNewMessage);
  router.get('/getMsgFromGroup/:groupid',userAuth.authenticate,messageController.groupMessages);
 

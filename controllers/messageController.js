@@ -20,16 +20,22 @@ exports.saveMessage = async(req, res, next) => {
     }
 }
 
-//getting new msg(if present) in every 2 sec
+//getting new msg(if present) in every 1 sec
 exports.getMessages = async(req, res, next) => {
     try{
         let oldMsgLength = +req.params.totalLen;
-        const messages = await Message.findAll({
-            where:{id: { [Op.gt]: oldMsgLength }},
-        });
+        const groupid = req.params.groupid;
+        // const messages = await Message.findAll({
+        //     where:{id: { [Op.gt]: oldMsgLength }},
+        // });
+
+        const messagess = await Message.findOne({
+            where: {groupId: groupid},
+            order: [['createdAt','DESC']],
+        })
 
         const username = req.user.name;
-        res.status(201).json({allMessages:messages,username});
+        res.status(201).json({allMessages:messagess,username});
 
     }
     catch(err){
@@ -42,7 +48,7 @@ exports.groupMessages = async (req,res,next) => {
         const groupid = req.params.groupid;
         let messages = await Message.findAll({where: {groupId:groupid}});
         let adminid = await usergroup.findOne({where: {isadmin: true,groupId:groupid}})
-        res.status(201).json({allMessages:messages,admin:adminid});
+        res.status(201).json({allMessages:messages,admin:adminid,logInUser:req.user.name});
     }
     catch(err){
         console.log(err)
