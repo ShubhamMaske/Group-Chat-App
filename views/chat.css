@@ -261,7 +261,7 @@ align-items:center;
     padding: 15px;
     overflow-y: auto;
 }
-.user-joined{
+/* .user-joined{
     font-size: 1rem;
     background-color: rgb(210, 220, 215);
     border-radius: 40px;
@@ -269,7 +269,7 @@ align-items:center;
     padding: 7px 15px;
     margin: 0 auto;
     margin-bottom: 10px;
-}
+} */
 
 .user-joined ul li{
     list-style: none;
@@ -285,22 +285,39 @@ align-items:center;
     /* border-radius: 10px 40px 10px 10px; */
 }
 
-.messages ul li {
-    list-style: none;
+
+.messageContainer{
     font-size: 20px;
     padding: 2px 0 2px 5px;
     background-color: rgb(232, 223, 223);
     margin-bottom: 10px;
-    max-width: 400px;
+    max-width: 100%;
     border-radius: 10px 40px 10px 10px;
-    /* overflow-x: auto; */
-    word-wrap: break-word;
 }
-/* #userName{
+
+.left{
+    float:left;
+    clear: both;
+    width: 300px;
+    border: 0.5px solid rgb(73, 71, 71);
+    border-radius: 0px 20px 20px 20px;
+    margin-bottom: 8px;
+    padding: 5px;
+    background-color: honeydew;
+}
+.right{
+    float:right;
+    clear: both;
+    width: 200px;
+    border: 0.5px solid rgb(73, 71, 71);
+    border-radius: 20px 0px 20px 20px;
     text-align: right;
-    background-color: rgb(207, 204, 204);
-    border-radius: 25px;
-} */
+    margin-bottom: 8px;
+    padding: 5px;
+    background-color: honeydew;
+}
+
+
 .msg{
     color: black;
     font-size: 16px;

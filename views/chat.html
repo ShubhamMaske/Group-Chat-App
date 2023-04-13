@@ -76,13 +76,18 @@
 
                         </ul>
                     </div>
+                    <div class="messageContainer">
+                        <div class="msgComming left"></div>
+                        <div class="msgComming right"></div>
+                    </div>
                     <div class="messages incoming">
-                        <ul id="addingMsg"></ul>
+                        <ul id="addingMsg" class="moveright"></ul>
                         <!-- <h5 id="userName"></h5> -->
                         <p class="msg"></p>
                         <ul></ul>
                     </div>
                     <div class="messages outgoing">
+                        <ul id="addingMsg2" class="moveleft"></ul>
                         <h5 id="userName"></h5>
                         <p class="msg2"></p>
                     </div>
@@ -95,6 +100,7 @@
         </div>
     </main>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.js" integrity="sha512-xbQU0+iHqhVt7VIXi6vBJKPh3IQBF5B84sSHdjKiSccyX/1ZI7Vnkt2/8y8uruj63/DVmCxfUNohPNruthTEQA==" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.js"></script>
     <script src="./chat.js"></script>
     <script>

@@ -34,6 +34,30 @@ async function createGroupFunction() {
 
 
 
+    const socket = io('http://localhost:8000');
+
+    socket.on("connect", () => {
+        try{
+        console.log(`connected with id:${socket.id}`)
+        }
+        catch(err){
+            console.log("connecting error ->",err);
+        }
+    })
+
+    socket.on('receivedMsg', message => {
+        try{
+        console.log(message);
+        //showMsg(message);
+        showingMessage(message);
+        }
+        catch(err){
+            console.log("connecting error ->",err);
+        }
+    })
+
+
+
 
 
 
@@ -45,6 +69,7 @@ document.getElementById("groupName").addEventListener("click", async function (e
         const groupid = e.target.id;
         document.getElementById('groupheading').innerHTML = e.target.innerHTML;
         document.getElementById('addingMsg').innerHTML = "";
+        document.querySelector(".messageContainer").innerHTML = "";
         if (localStorage.getItem('currentgroupid') == null || localStorage.getItem('currentgroupid') !== groupid) {
             localStorage.setItem('currentgroupid', groupid);
             const token = localStorage.getItem('usertoken');
@@ -52,14 +77,16 @@ document.getElementById("groupName").addEventListener("click", async function (e
 
             
             var totalMsgs = messages.data.allMessages.length;
+            var groupMessagesLength = messages.data.allMessages.length;
             var admin_id = messages.data.admin.userId;
             localStorage.setItem('adminId', admin_id);
             for (var i = 0; i < messages.data.allMessages.length; i++) {
-                showMessages(messages.data.allMessages[i]);
+                showingMessage(messages.data.allMessages[i])
             }
             if (totalMsgs > 0) {
                 var idOfLastMessage = messages.data.allMessages[totalMsgs - 1].id;
                 localStorage.setItem('idOfLastMessage', idOfLastMessage);
+                localStorage.setItem('groupMessagesLength', groupMessagesLength);
             } else {
                 console.log(" zero messages");
             }
@@ -70,7 +97,7 @@ document.getElementById("groupName").addEventListener("click", async function (e
             users.data.AllUsers.forEach(element => {
                 showUsers(element);
             });
-            setInterval(gettingMsg, 2000);
+            //setInterval(gettingMsg, 2000);
         }
     }
     catch (err) {
@@ -80,33 +107,6 @@ document.getElementById("groupName").addEventListener("click", async function (e
 /* -------------------------------------------------- */
 
 
-
-
-
-async function gettingMsg() {
-    try {
-        const token = localStorage.getItem('usertoken');
-        var totalLen = localStorage.getItem('len');
-        var groupid = localStorage.getItem('currentgroupid');
-        const messages = await axios.get(`http://localhost:3000/message/getMsg/${totalLen}/${groupid}`, { headers: { "Authorization": token } })
-        
-
-            if(messages.data.allMessages){
-            if (messages.data.allMessages.id != localStorage.getItem('idOfLastMessage')) {
-                localStorage.setItem('idOfLastMessage', messages.data.allMessages.id)
-                totalLen++;
-                localStorage.setItem('len', totalLen);
-                showMessages(messages.data.allMessages);
-                
-            }
-        }
-            
-        
-    }
-    catch (err) {
-    console.log("getting updated msg error/no new message --", err);
-}
-}
 
 var messages = [];
 localStorage.setItem('MsgArray', JSON.stringify(messages));
@@ -145,6 +145,8 @@ window.addEventListener("DOMContentLoaded", async () => {
 })
 
 
+//-----------------------------------------------------------------------------//
+// --------------------------- Save Message to Database -----------------------//
 async function addMessage(e) {
     try {
         e.preventDefault();
@@ -159,10 +161,19 @@ async function addMessage(e) {
         const response = await axios.post(`http://localhost:3000/message/saveMsg/${groupid}`, myMessage, { headers: { "Authorization": token } });
         var length = localStorage.getItem('len');
         length++;
+        var groupmsgLength = localStorage.getItem('groupMessagesLength');
+        groupmsgLength++;
+
+
+        socket.emit('send-message',response.data.Info);
+        
+        
         localStorage.setItem('len', length);
         localStorage.setItem('messageId', response.data.Info.id);
         localStorage.setItem('idOfLastMessage',response.data.Info.id);
-        showMessages(response.data.Info);
+        localStorage.setItem('groupMessagesLength',groupmsgLength);
+        //showMessages(response.data.Info);
+        showingMessage(response.data.Info);
 
 
     }
@@ -172,6 +183,37 @@ async function addMessage(e) {
 }
 
 
+
+//-----------------------------------------------------------------------//
+
+
+async function showingMessage(data){
+    try{
+    const messageContainer = document.querySelector(".messageContainer");
+    var chatwindow = document.querySelector(".chats");
+    const messageElement = document.createElement('div');
+    //messageElement.innerText = data.message;
+    messageElement.classList.add('msgComming');
+    var userid = localStorage.getItem('loginuserID');
+    if(data.userId == userid){
+        let msg = data.message;
+        const myArr = msg.split(":");
+        myArr[0] = "you: ";
+        messageElement.innerText = myArr.join("");
+        messageElement.classList.add('right');
+    }else{
+        messageElement.innerText = data.message;
+        messageElement.classList.add('left');
+    }
+
+    messageContainer.append(messageElement);
+    chatwindow.scrollTop = chatwindow.scrollHeight;
+    }
+    catch(err){
+        console.log(err);
+    }
+}
+//----------------------------Show Messages on Screen ------------------//
 async function showMessages(data) {
     try {
         const parentEle = document.getElementById('addingMsg');
@@ -188,6 +230,8 @@ async function showMessages(data) {
     }
 }
 
+
+//------------------------Show Users of Group on Screen ------------------//
 async function showUsers(user) {
     try {
         const parentEle = document.getElementById('users');
@@ -258,6 +302,10 @@ async function showUsers(user) {
     }
 }
 
+
+
+
+//---------------------- Showing the Users Group ---------------------//
 async function showUsergroups(group) {
     try {
         let parentElement = document.getElementById('groupName');
