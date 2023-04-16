@@ -135,6 +135,10 @@ align-items:center;
     margin-left: 5px;
 }
 
+.liButton:hover{
+    cursor: pointer;
+}
+
 .removeuser{
     width: fit-content;
     padding: 1px;
@@ -332,14 +336,50 @@ align-items:center;
     justify-content:space-around;
     align-items:stretch;
 }
+
+/* ------------------Image upload --------------- */
+#fileupload{
+    width: 25px;
+    background: transparent;
+    border: none;
+}
+.uploadImage{
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 200px;
+    height: 100px;
+    border-radius: 10px;
+    background-color: rgb(239, 238, 243);
+}
+.imageform{
+    width: 300px;
+    height:100px;
+    border-radius: 10px;
+    background-color: rgb(239, 238, 243);
+}
+.imageform input{
+    margin-top: 10px;
+}
+.imageform button{
+    width: fit-content;
+    border-radius: 10px;
+    padding: 5px;
+    margin-left: 40%;
+    margin-top: 10px;
+    background-color: azure;
+}
+
+/* --------------------------------------------------------------------- */
+
+
 input{
     font-size: 16px;
     padding: 5px 15px;
     width: 90%;
     border-radius: 10px;
 }
-
-
 
 button{
     background-color: aqua;

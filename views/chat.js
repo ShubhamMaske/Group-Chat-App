@@ -58,7 +58,30 @@ async function createGroupFunction() {
 
 
 
+// ---------------------------------------------------
 
+    let imageForm  = document.getElementById('imageform');
+    const imageInput = document.querySelector('#imagefile');
+    imageForm.addEventListener('submit',async event => {
+        event.preventDefault();
+        const token = localStorage.getItem('usertoken');
+        const groupid = localStorage.getItem('currentgroupid');
+        const file = imageInput.files[0];
+        const formData = new FormData();
+        formData.append("imagefile",file);
+        console.log("image ",file);
+        document.getElementById('imageform').style.display = 'none';
+        const response = axios.post(`http://localhost:3000/upload/imgUpload/${groupid}`,formData,{ headers: {'Content-Type': 'multipart/form-data',"Authorization": token}});
+
+        showingImage(response.data.result,response.data.username)
+
+
+    });
+
+    
+
+
+// ---------------------------------------------------
 
 
 /* ------------------- Get Messages from specified group ------- */
@@ -91,7 +114,7 @@ document.getElementById("groupName").addEventListener("click", async function (e
                 console.log(" zero messages");
             }
 
-
+            socket.emit("join",groupid);
             const users = await axios.get(`http://localhost:3000/user/allusers/${groupid}`)
             document.getElementById('users').innerHTML = "";
             users.data.AllUsers.forEach(element => {
@@ -165,14 +188,13 @@ async function addMessage(e) {
         groupmsgLength++;
 
 
-        socket.emit('send-message',response.data.Info);
+        socket.emit('send-message',response.data.Info,groupid);
         
         
         localStorage.setItem('len', length);
         localStorage.setItem('messageId', response.data.Info.id);
         localStorage.setItem('idOfLastMessage',response.data.Info.id);
         localStorage.setItem('groupMessagesLength',groupmsgLength);
-        //showMessages(response.data.Info);
         showingMessage(response.data.Info);
 
 
@@ -181,7 +203,34 @@ async function addMessage(e) {
         console.log("sending msg error -- ", err)
     }
 }
+//-----------------------------------------------------------------------//
 
+async function showingImage(data,username){
+    try{
+        const messageContainer = document.querySelector(".messageContainer");
+        var chatwindow = document.querySelector(".chats");
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('msgComming');
+        var userid = localStorage.getItem('loginuserID');
+        if(data.userId == userid){
+            const urlchild = document.createElement('a');
+            urlchild.innerHTML = `Image from ${username}`;
+            urlchild.href = data.message
+            messageElement.classList.add('right');
+        }else{
+            const urlchild = document.createElement('a');
+            urlchild.innerHTML = `Image from ${username}`;
+            urlchild.href = data.message
+            messageElement.classList.add('left');
+        }
+    
+        messageContainer.append(messageElement);
+        chatwindow.scrollTop = chatwindow.scrollHeight;
+        }
+        catch(err){
+            console.log(err);
+        }
+}
 
 
 //-----------------------------------------------------------------------//
@@ -192,7 +241,6 @@ async function showingMessage(data){
     const messageContainer = document.querySelector(".messageContainer");
     var chatwindow = document.querySelector(".chats");
     const messageElement = document.createElement('div');
-    //messageElement.innerText = data.message;
     messageElement.classList.add('msgComming');
     var userid = localStorage.getItem('loginuserID');
     if(data.userId == userid){
