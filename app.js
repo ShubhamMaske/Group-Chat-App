@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer  = require('multer')
+const cron = require('node-cron');
 const upload = multer({ dest: 'uploads/' })
 
 const userRoutes = require('./routes/userRoutes');
@@ -16,9 +17,12 @@ const User = require('./models/users');
 const Message = require('./models/messages');
 const Group = require('./models/groups');
 const userGroup = require('./models/usergroups');
+const ArchivedChat = require('./models/archivedChat');
 
 
 const db = require('./util/database');
+const scheduler =require('./util/schedule');
+
 const { Socket } = require('socket.io');
 require('dotenv').config();
 const app = express();
@@ -72,6 +76,12 @@ Message.belongsTo(Group);
 Group.belongsToMany(User,{through:userGroup})
 User.belongsToMany(Group,{through:userGroup})
 
+User.hasMany(ArchivedChat);
+ArchivedChat.belongsTo(User);
+
+Group.hasMany(ArchivedChat);
+ArchivedChat.belongsTo(Group);
+
 /*   -----------------------     */
 
 db.sync()
@@ -81,3 +91,5 @@ db.sync()
     .catch(err => {
         console.log(err);
     })
+
+cron.schedule('59 59 23 * * *', scheduler.moveChatsToArchivedChats);
