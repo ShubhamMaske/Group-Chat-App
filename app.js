@@ -1,11 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-
+const multer  = require('multer')
+const upload = multer({ dest: 'uploads/' })
 
 const userRoutes = require('./routes/userRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const groupRoutes = require('./routes/groupRoutes');
+const imageUploadRoute = require('./routes/imageupload');
+const forgotpasswordRoute = require('./routes/forgotpasswordRoutes');
 
 
 
@@ -16,11 +19,13 @@ const userGroup = require('./models/usergroups');
 
 
 const db = require('./util/database');
+const { Socket } = require('socket.io');
 require('dotenv').config();
 const app = express();
 app.use(cors());
 
 app.use(bodyParser.json({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 
 const io = require('socket.io')(8000,{
@@ -30,21 +35,31 @@ const io = require('socket.io')(8000,{
 })
 
 io.on('connection',socket => {
-    try{
-        socket.on('send-message', message => {
-            console.log("send-message calls== ",message);
-            socket.broadcast.emit('receivedMsg',message);
+    socket.on("join",groupid => {
+        socket.join(groupid)
     })
-    }
-    catch(err){
-        console.log("app.js err ->",err)
-    }
+    socket.on('send-message', (message, groupid) => {
+        console.log("send-message calls== ",message);
+        socket.broadcast.in(groupid).emit('receivedMsg',message);
+    })
+
+        
 })
 
 
 app.use('/user', userRoutes);
 app.use('/message',messageRoutes);
 app.use('/group',groupRoutes);
+app.use('/upload',upload.single("imagefile"),imageUploadRoute);
+app.use('/password',forgotpasswordRoute);
+
+
+
+
+app.use((req,res) => {
+    console.log("url -> ",req.url);
+    res.sendFile(path.join(__dirname,`views/${req.url}`));
+})
 
 
 /*   DataBase Relationships     */
